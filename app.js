@@ -4,16 +4,12 @@
 $(function ($) {
 
     var rootData = new Firebase('https://interview-bolster.firebaseio.com/');
-    //var rootData = new Firebase('https://interview-bolster.firebaseio.com/');
     var topics = rootData.child('topics');
-    // var topicsObj = rootData.child('topics').exportVal();
-    
     var topicsDataObj;
-
     var participants = rootData.child('participants');
     var participantsDataObj;
-    
-    console.log(participants)
+    var transContent = $('<div/>');
+
 
 
     participants.once("value", function (snapshot) {
@@ -22,19 +18,14 @@ $(function ($) {
     });
 
     topics.once("value", function(snapshot) {
-        //console.log(snapshot);
-
-        topicsDataObj = snapshot;
-        console.log('topicsDataObj'+topicsDataObj);
-        //console.log('topicsDataObj first entry' + topicsDataObj[1].name);
-
+        topicsDataObj = snapshot;  
         generateContent();
-
     });
+
 
     function findSpeakerAvater (speakerNum) {
 
-        console.log(participantsDataObj[speakerNum].avatar);
+       // console.log(participantsDataObj[speakerNum].avatar);
         return participantsDataObj[speakerNum].avatar;  
 
     }
@@ -42,44 +33,68 @@ $(function ($) {
     function searchData () {
         //how do I query this to pull only discussion topics that have whatever's being searched for?
 
+
     }
 
     function generateContent () {
         var topicsMenu = $('<ul/>', {
             'class': 'topics-menu'
         });
-        var transContent = $('<div/>');
 
         topicsDataObj.forEach(function(data) {
-            console.log("The topic of" + data.val().name);
-            console.log(data.child('discussion').numChildren());
-
-            topicsMenu.append( $('<li>', {
-                html: $('<a/>', {
-                    href: '#',
-                    text: data.val().name
-                }) 
-            }));
-
-            transContent.append( $('<h2/>', {
-                'class': 'topic-header',
-                text: data.val().name
-            }));
-
-            data.child('discussion').forEach( function(content) {
-                console.log('discussion content is ' + content.val().text)
-                var speakerAvatar = findSpeakerAvater(content.val().speaker);
-
-                transContent.append( $('<div/>', {
-                    'class': 'note',
-                    html: "<img class='avatar' src='" + speakerAvatar + "'/><p>" + content.val().text + "</p>"
-                }));
-            });
+            generateTopicMenu (topicsMenu, data)
+            generateTopicContent(transContent, data)
 
         });
 
         $('#menu').append(topicsMenu);
         $('#content').append(transContent);
+
+        // var menuItem = $('.topics-menu li');
+        // menuItem.on('click', showSingleTopic);
+    }
+
+    function showSingleTopic(evt) {
+        var el = $(evt.target);
+        var key = el.attr('topic')
+        transContent = $('<div/>');
+        var topicChild = topics.child(key);
+
+        topicChild.once("value", function(snapshot){
+            topicsDataObj = snapshot;
+            generateTopicContent(transContent, topicsDataObj);
+            $('#content').html(transContent);
+        })
+    }
+
+    function generateTopicMenu (menu, data) {
+        menu.append( $('<li>', {
+            html: $('<a/>', {
+                href: '#',
+                text: data.val().name,
+                'topic': data.key(),
+                click: showSingleTopic
+            }) 
+        }));
+    }
+
+    //function for generating topic content
+    function generateTopicContent(topic, data){
+
+        console.log(data.val().name);
+        topic.append( $('<h2/>', {
+            'class': 'topic-header',
+            text: data.val().name
+        }));
+
+        data.child('discussion').forEach( function(content) {
+            var speakerAvatar = findSpeakerAvater(content.val().speaker);
+
+            topic.append( $('<div/>', {
+                'class': 'note',
+                html: "<img class='avatar' src='" + speakerAvatar + "'/><p>" + content.val().text + "</p>"
+            }));
+        });
     }
 
 });
