@@ -1,0 +1,45 @@
+/* Transcript App Styles */
+
+#container {
+    width: 75%;
+    margin: 0 auto;
+}
+
+#menu p {
+    display: block;
+    float: left;
+}
+
+.topics-menu {
+    list-style-type: none;
+    padding: 0;
+    float: right;
+    width: 90%;
+}
+
+.topics-menu li{
+    float: left;
+    margin: 8px;
+}
+
+.topic-header {
+    display: block;
+    clear: both;
+    margin-top: 50px;
+}
+
+.note {
+    float: none;
+    display: block;
+    clear: both;
+    margin: 10px 0;
+    height: auto;
+}
+
+img.avatar {
+    width: 50px;
+    float: left;
+    margin-right: 10px;
+    display: block;
+    margin-bottom: 10px;
+}
