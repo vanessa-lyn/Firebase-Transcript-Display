@@ -17,7 +17,7 @@ $(function ($) {
 
     participants.once("value", function (snapshot) {
         participantsDataObj = snapshot.val();
-        console.log("participantsDataObj" + participantsDataObj)
+        // console.log("participantsDataObj" + participantsDataObj)
     });
 
     topics.once("value", function(snapshot) {
@@ -39,26 +39,13 @@ $(function ($) {
         if (code === 13) {
             searchKeyword = search.val();
             //resultContainer.html('');
-            console.log('searchKeyword' + searchKeyword);
+            // console.log('searchKeyword' + searchKeyword);
             if((searchKeyword !== '')||(searchKeyword !== ' ')) {
                 searchData(searchKeyword);
             }
         }
     })
-
-    // function checkKeyword(keyword) {
-    //     console.log('keyword' + keyword);
-
-    //     // if((keyword !== '')||(keyword !== ' ')) {
-    //     //     searchingNotes == true; 
-    //     // }
-    //     // console.log(topicsDataObj.contains(keyword));
-
-    //     //One way of doing it but I want to find a possible better method
-    //     //$( "p:contains('killer')" ).css( "text-decoration", "underline" );
-    // }
-
-
+    
     function findSpeakerAvater (speakerNum) {
 
        // console.log(participantsDataObj[speakerNum].avatar);
@@ -68,14 +55,14 @@ $(function ($) {
 
     function searchData (keyword) {
 
-        console.log('searching data');
-        console.log('keyword ' + keyword);
+        // console.log('searching data');
+        // console.log('keyword ' + keyword);
         
         transContent = $('<div/>');
 
         topicsDataObj.forEach(function(data) {
             var title = data.val().name;
-            console.log('for each' + title);
+            // console.log('for each' + title);
             if (title.indexOf(keyword) > -1){
                 higlightedTxt = data.val().name.replace(keyword, '<span class="highlight">'+keyword+'</span>');
 
@@ -137,7 +124,7 @@ $(function ($) {
     //function for generating topic content
     function generateTopicContent(topic, data){
 
-        console.log(data.val().name);
+        // console.log(data.val().name);
         topic.append( $('<h2/>', {
             'class': 'topic-header',
             text: data.val().name
