@@ -9,6 +9,9 @@ $(function ($) {
     var participants = rootData.child('participants');
     var participantsDataObj;
     var transContent = $('<div/>');
+    var search = $('#search input');
+    var searchMessage = "Search Transcripts";
+    var searchingNotes = false;
 
 
 
@@ -22,6 +25,39 @@ $(function ($) {
         generateContent();
     });
 
+    search.attr('value', searchMessage)
+    .on('focus', function () {
+            search.attr('value', '');
+        })
+    .on('blur', function () {
+        if(search.attr('value') === '') {
+            search.attr('value', searchMessage);
+        }
+    })
+    .bind('keypress', function (e) {
+        var code = e.keyCode || e.which;
+        if (code === 13) {
+            searchKeyword = search.val();
+            //resultContainer.html('');
+            console.log('searchKeyword' + searchKeyword);
+            if((searchKeyword !== '')||(searchKeyword !== ' ')) {
+                searchData(searchKeyword);
+            }
+        }
+    })
+
+    // function checkKeyword(keyword) {
+    //     console.log('keyword' + keyword);
+
+    //     // if((keyword !== '')||(keyword !== ' ')) {
+    //     //     searchingNotes == true; 
+    //     // }
+    //     // console.log(topicsDataObj.contains(keyword));
+
+    //     //One way of doing it but I want to find a possible better method
+    //     //$( "p:contains('killer')" ).css( "text-decoration", "underline" );
+    // }
+
 
     function findSpeakerAvater (speakerNum) {
 
@@ -30,10 +66,46 @@ $(function ($) {
 
     }
 
-    function searchData () {
-        //how do I query this to pull only discussion topics that have whatever's being searched for?
+    function searchData (keyword) {
 
+        console.log('searching data');
+        console.log('keyword ' + keyword);
+        
+        transContent = $('<div/>');
 
+        topicsDataObj.forEach(function(data) {
+            var title = data.val().name;
+            console.log('for each' + title);
+            if (title.indexOf(keyword) > -1){
+                higlightedTxt = data.val().name.replace(keyword, '<span class="highlight">'+keyword+'</span>');
+
+                transContent.append( $('<h2/>', {
+                    'class': 'topic-header',
+                    html: higlightedTxt
+                }));
+            }
+
+            $("h2:contains('cow')").html(function(_, html) {
+                   return html.replace(/(cow)/g, '<span class="smallcaps">$1</span>');
+            });
+            data.child('discussion').forEach( function(content) {
+                var note = content.val().text;
+                //console.log('content ' + content.val().text);
+
+                var speakerAvatar = findSpeakerAvater(content.val().speaker);
+
+                if(note.indexOf(keyword) > -1) {
+                    higlightedTxt = content.val().text.replace(keyword, '<span class="highlight">'+keyword+'</span>');
+                    transContent.append( $('<div/>', {
+                        'class': 'note',
+                        html: "<img class='avatar' src='" + speakerAvatar + "'/><p>" + higlightedTxt + "</p>"
+                    }));
+                } 
+            });
+
+        });
+
+        $('#content').html(transContent);
     }
 
     function generateContent () {
@@ -49,22 +121,6 @@ $(function ($) {
 
         $('#menu').append(topicsMenu);
         $('#content').append(transContent);
-
-        // var menuItem = $('.topics-menu li');
-        // menuItem.on('click', showSingleTopic);
-    }
-
-    function showSingleTopic(evt) {
-        var el = $(evt.target);
-        var key = el.attr('topic')
-        transContent = $('<div/>');
-        var topicChild = topics.child(key);
-
-        topicChild.once("value", function(snapshot){
-            topicsDataObj = snapshot;
-            generateTopicContent(transContent, topicsDataObj);
-            $('#content').html(transContent);
-        })
     }
 
     function generateTopicMenu (menu, data) {
@@ -95,6 +151,19 @@ $(function ($) {
                 html: "<img class='avatar' src='" + speakerAvatar + "'/><p>" + content.val().text + "</p>"
             }));
         });
+    }
+
+    function showSingleTopic(evt) {
+        var el = $(evt.target);
+        var key = el.attr('topic')
+        transContent = $('<div/>');
+        var topicChild = topics.child(key);
+
+        topicChild.once("value", function(snapshot){
+            topicsDataObj = snapshot;
+            generateTopicContent(transContent, topicsDataObj);
+            $('#content').html(transContent);
+        })
     }
 
 });

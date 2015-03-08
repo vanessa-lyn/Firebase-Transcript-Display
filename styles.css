@@ -1,5 +1,9 @@
 /* Transcript App Styles */
 
+.highlight {
+    background-color: yellow;
+}
+
 #container {
     width: 75%;
     margin: 0 auto;
